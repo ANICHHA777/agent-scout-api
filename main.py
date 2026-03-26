@@ -138,6 +138,15 @@ async def get_incidents(limit: int = 50):
 @app.post("/incidents/ingest")
 async def ingest_incident(payload: Dict[str, Any], x_api_secret: str = Header(None)):
     if x_api_secret != API_SECRET: raise HTTPException(status_code=403)
+    
+    # ПРОВЕРКА НА ДУБЛИКАТ
+    existing = await db.fetch_one(
+        "SELECT id FROM incidents WHERE source = ? AND clean_text = ? LIMIT 1",
+        payload["source"], payload["clean_text"]
+    )
+    if existing:
+        return {"id": existing[0], "status": "duplicate_skipped"}
+
     incident_id = str(uuid4())
     try:
         async with httpx.AsyncClient() as client:
@@ -151,7 +160,7 @@ async def ingest_incident(payload: Dict[str, Any], x_api_secret: str = Header(No
         incident_id, payload["source"], payload["source_type"], payload["platform"], payload["label"], 
         payload["clean_text"], class_data["category"], class_data["repair_urgency"], 1 if payload.get("hotspot_alert") else 0, datetime.now().isoformat()
     )
-    return {"id": incident_id}
+    return {"id": incident_id, "status": "created"}
 
 if __name__ == "__main__":
     import uvicorn
