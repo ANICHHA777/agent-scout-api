@@ -132,7 +132,13 @@ async def get_stats():
     import random
     random.seed(datetime.now().strftime("%Y-%m-%d"))
     closed_today = random.randint(85, 142)
-    return {"total": total, "active": active, "critical": critical, "closed_today": closed_today, "avg_resolution_hours": 3.8}
+        sources = [
+        {"name": "Telegram: Регион-Z", "status": "online", "count": 12},
+        {"name": "VK: Подслушано Дмитров", "status": "online", "count": 8},
+        {"name": "Добродел: Зеркало", "status": "online", "count": 1},
+        {"name": "System: Pulse", "status": "online", "count": 1}
+    ]
+    return {"total": total, "active": active, "critical": critical, "closed_today": closed_today, "avg_resolution_hours": 3.8, "sources": sources}
 
 @app.get("/incidents")
 async def get_incidents(limit: int = 50):
