@@ -183,3 +183,5 @@ async def ingest_incident(payload: Dict[str, Any], x_api_secret: str = Header(No
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8003)
+
+# Force Redeploy: 7c6dff
